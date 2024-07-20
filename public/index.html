@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Group Chat</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        #auth,
+        #chat {
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            max-width: 600px;
+            /* Increased chat card size */
+            width: 100%;
+            height: 80vh;
+            /* Set a maximum height for chat */
+            display: flex;
+            flex-direction: column;
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            flex: 1;
+            /* Allow messages to take up remaining space */
+            overflow-y: auto;
+        }
+
+        li {
+            padding: 10px;
+            margin-bottom: 8px;
+            background: #f4f4f4;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .message-left {
+            text-align: left;
+            background: #d1f0ff;
+            margin-right: auto;
+            padding: 8px 12px;
+            align-self: flex-start;
+            /* Ensure messages align to the left */
+        }
+
+        .message-right {
+            text-align: right;
+            background: #dff0d1;
+            margin-left: auto;
+            padding: 8px 12px;
+            align-self: flex-end;
+            /* Ensure messages align to the right */
+        }
+
+        .avatar {
+            width: 30px;
+            height: 30px;
+            background: #007bff;
+            color: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+
+        .avatar.left {
+            background: #d1f0ff;
+            color: #007bff;
+        }
+
+        .avatar.right {
+            background: #dff0d1;
+            color: #28a745;
+        }
+
+        .room-select-container {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .room-select-container select {
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            background: #ffffff;
+            color: #333;
+            font-size: 16px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            box-sizing: border-box;
+        }
+
+        .room-select-container select:focus {
+            border-color: #007bff;
+            outline: none;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: #f9f9f9;
+            border-radius: 4px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-info .avatar {
+            background: #007bff;
+            color: #fff;
+            margin: 0;
+            font-size: 18px;
+        }
+
+        .user-info h3 {
+            margin: 0;
+            color: #333;
+        }
+
+        .group-info {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: #f9f9f9;
+            border-radius: 4px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .group-info h3 {
+            margin: 0;
+            color: #9100ff;
+            font-size: 24px;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            /* Add space between rows */
+        }
+
+        input {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        button {
+            padding: 10px;
+            border: none;
+            background: #007bff;
+            color: #fff;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s ease;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        .toggle-button {
+            background: #28a745;
+            margin-top: 10px;
+        }
+
+        .toggle-button:hover {
+            background: #218838;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="auth">
+        <h2 id="auth-title">Login</h2>
+        <form id="auth-form">
+            <input type="text" id="username" placeholder="Username" required />
+            <input type="password" id="password" placeholder="Password" required />
+            <div class="room-select-container">
+                <select id="roomSelect" required>
+                    <option value="Cricket">Cricket</option>
+                    <option value="Football">Football</option>
+                </select>
+            </div>
+            <button type="submit" id="auth-button">Login</button>
+            <button type="button" id="toggle-button" class="toggle-button">Switch to Signup</button>
+        </form>
+    </div>
+    <div id="chat" style="display:none;">
+        <div class="group-info">
+            <h3 id="group-name">Room Name</h3>
+        </div>
+        <div class="user-info">
+            <div id="user-avatar" class="avatar"></div>
+            <div>
+                <h3 id="nameDisp">Username</h3>
+            </div>
+        </div>
+        <ul id="messages"></ul>
+        <form id="form" action="">
+            <input id="input" autocomplete="off" placeholder="Type your message..." />
+            <button>Send</button>
+        </form>
+    </div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        let socket;
+        const auth = document.getElementById('auth');
+        const chat = document.getElementById('chat');
+        const authForm = document.getElementById('auth-form');
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        const roomSelect = document.getElementById('roomSelect');
+        const form = document.getElementById('form');
+        const input = document.getElementById('input');
+        const messages = document.getElementById('messages');
+        const userAvatar = document.getElementById('user-avatar');
+        const usernameDisplay = document.getElementById('nameDisp');
+        const groupNameDisplay = document.getElementById('group-name');
+        const authButton = document.getElementById('auth-button');
+        const toggleButton = document.getElementById('toggle-button');
+        const authTitle = document.getElementById('auth-title');
+
+        let isLogin = true;  // Default mode is login
+
+        authButton.addEventListener('click', async function (e) {
+            e.preventDefault();
+            const username = usernameInput.value;
+            const password = passwordInput.value;
+            const room = roomSelect.value;
+            let endpoint, method;
+
+            if (isLogin) {
+                endpoint = '/auth/login';
+                method = 'POST';
+            } else {
+                endpoint = '/auth/register';
+                method = 'POST';
+            }
+
+            try {
+                const response = await fetch(endpoint, {
+                    method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    auth.style.display = 'none';
+                    chat.style.display = 'flex';
+                    usernameDisplay.textContent = username;
+                    userAvatar.textContent = username.charAt(0).toUpperCase();
+                    groupNameDisplay.textContent = room;
+                    await loadMessages(room);
+                    connectSocket(data.token, username, room);
+                } else {
+                    alert(isLogin ? 'Login failed' : 'Signup failed');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Authentication Failed!');
+            }
+        });
+
+        toggleButton.addEventListener('click', function () {
+            isLogin = !isLogin;
+            authButton.textContent = isLogin ? 'Login' : 'Signup';
+            authTitle.textContent = isLogin ? 'Login' : 'Signup';
+            toggleButton.textContent = isLogin ? 'Switch to Signup' : 'Switch to Login';
+        });
+
+        authForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            authButton.click();
+        });
+
+        async function loadMessages(room) {
+            try {
+                const response = await fetch(`auth/messages?group=${room}`);
+                const messages = await response.json();
+                messages.reverse().forEach(msg => {
+                    displayMessage(msg);
+                });
+            } catch (err) {
+                console.error('Error fetching messages:', err);
+            }
+        }
+
+        function displayMessage(msg) {
+            const item = document.createElement('li');
+            const avatar = document.createElement('div');
+            avatar.className = 'avatar ' + (msg.sender === usernameDisplay.textContent ? 'right' : 'left');
+            avatar.textContent = msg.sender.charAt(0).toUpperCase();
+            item.className = msg.sender === usernameDisplay.textContent ? 'message-right' : 'message-left';
+            item.appendChild(avatar);
+            item.appendChild(document.createTextNode(`${msg.sender}: ${msg.text}`));
+            messages.appendChild(item);
+            window.scrollTo(0, document.body.scrollHeight);
+        }
+
+        function connectSocket(token, username, room) {
+            socket = io({ query: { token } });
+
+            roomSelect.addEventListener('change', async function () {
+                socket.emit('join room', roomSelect.value);
+                groupNameDisplay.textContent = roomSelect.value;
+                messages.innerHTML = '';
+                await loadMessages(roomSelect.value);
+            });
+
+            form.addEventListener('submit', function (e) {
+                e.preventDefault();
+                if (input.value) {
+                    socket.emit('chat message', { text: input.value, room: roomSelect.value });
+                    input.value = '';
+                }
+            });
+
+            socket.on('chat message', function (msg) {
+                displayMessage(msg);
+            });
+
+            socket.on('private message', function (msg) {
+                const item = document.createElement('li');
+                const avatar = document.createElement('div');
+                avatar.className = 'avatar right';
+                avatar.textContent = msg.sender.charAt(0).toUpperCase();
+                item.className = 'message-right';
+                item.appendChild(avatar);
+                item.appendChild(document.createTextNode(`(Private) ${msg.sender}: ${msg.text}`));
+                messages.appendChild(item);
+                window.scrollTo(0, document.body.scrollHeight);
+            });
+
+            socket.emit('join room', room); // Join selected room on load
+        }
+    </script>
+</body>
+
+</html>
