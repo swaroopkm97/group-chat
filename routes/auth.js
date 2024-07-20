@@ -4,7 +4,7 @@ const User = require('../models/User');
 const Message = require('../models/Message');
 
 const router = express.Router();
-const jwtSecret = 'd3cee275154480a60547d8e4f108a461875dc9a995a84653941bfd34d84e6032';
+const jwtSecret = 'Your JWT Secret';
 
 // User registration
 router.post('/register', async (req, res) => {

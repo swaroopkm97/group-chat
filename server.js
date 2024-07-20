@@ -11,7 +11,7 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
 
-const jwtSecret = 'd3cee275154480a60547d8e4f108a461875dc9a995a84653941bfd34d84e6032';
+const jwtSecret = 'Your JWT Secret';
 
 mongoose.connect('mongodb://localhost/advanced-chat', { useNewUrlParser: true, useUnifiedTopology: true });
 
